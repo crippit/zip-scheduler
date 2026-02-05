@@ -1,0 +1,5 @@
+{
+  "name": "ZipCycle Scheduler",
+  "description": "A high-efficiency cycle-based school scheduling tool for teachers by Zip Solutions. Manage complex cycle days, holidays, and periods with natural language input and Google Calendar export.",
+  "requestFramePermissions": []
+}
