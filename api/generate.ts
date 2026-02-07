@@ -1,9 +1,5 @@
-import { GoogleGenAI, Type } from "@google/genai";
-
-
-
 export const config = {
-    maxDuration: 60,
+    runtime: 'edge',
 };
 
 const apiKey = process.env.GEMINI_API_KEY;
@@ -33,10 +29,7 @@ export default async function handler(request: Request) {
             });
         }
 
-        const ai = new GoogleGenAI({ apiKey });
-        const response = await ai.models.generateContent({
-            model: 'gemini-1.5-flash',
-            contents: `Analyze the following teacher's schedule description and extract structured data.
+        const prompt = `Analyze the following teacher's schedule description and extract structured data.
       
       Description: "${description}"
       
@@ -47,44 +40,62 @@ export default async function handler(request: Request) {
       4. Room numbers mentioned
       5. List of unique class names or subjects mentioned (e.g. "Math 10", "Physics 11", "Homeroom")
       
-      If information is missing, use reasonable defaults (e.g., 6 cycle days, 8 periods).`,
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        cycleDays: { type: Type.NUMBER },
-                        periodsPerDay: { type: Type.NUMBER },
-                        rooms: { type: Type.ARRAY, items: { type: Type.STRING } },
-                        classList: { type: Type.ARRAY, items: { type: Type.STRING } },
-                        periods: {
-                            type: Type.ARRAY,
-                            items: {
-                                type: Type.OBJECT,
-                                properties: {
-                                    name: { type: Type.STRING },
-                                    startTime: { type: Type.STRING, description: "HH:mm format" },
-                                    endTime: { type: Type.STRING, description: "HH:mm format" }
-                                },
-                                required: ["name", "startTime", "endTime"]
+      If information is missing, use reasonable defaults (e.g., 6 cycle days, 8 periods).`;
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: prompt }]
+                }],
+                generationConfig: {
+                    response_mime_type: "application/json",
+                    response_schema: {
+                        type: "OBJECT",
+                        properties: {
+                            cycleDays: { type: "NUMBER" },
+                            periodsPerDay: { type: "NUMBER" },
+                            rooms: { type: "ARRAY", items: { type: "STRING" } },
+                            classList: { type: "ARRAY", items: { type: "STRING" } },
+                            periods: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        name: { type: "STRING" },
+                                        startTime: { type: "STRING", description: "HH:mm format" },
+                                        endTime: { type: "STRING", description: "HH:mm format" }
+                                    },
+                                    required: ["name", "startTime", "endTime"]
+                                }
                             }
-                        }
-                    },
-                    required: ["cycleDays", "periodsPerDay", "rooms", "classList", "periods"]
+                        },
+                        required: ["cycleDays", "periodsPerDay", "rooms", "classList", "periods"]
+                    }
                 }
-            }
+            })
         });
 
-        let jsonStr = response.text?.trim() || "{}";
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Gemini API Error: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+        // Gemini REST API returns { candidates: [ { content: { parts: [ { text: "..." } ] } } ] }
+        let jsonStr = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
 
         // Remove markdown code blocks if present
         if (jsonStr.startsWith('```')) {
             jsonStr = jsonStr.replace(/^```(json)?\n/, '').replace(/```$/, '').trim();
         }
 
-        let data;
+        let parsedData;
         try {
-            data = JSON.parse(jsonStr);
+            parsedData = JSON.parse(jsonStr);
         } catch (parseError) {
             console.error("JSON Parse Error:", parseError, "Raw Response:", jsonStr);
             return new Response(JSON.stringify({ error: "Failed to parse AI response", raw: jsonStr }), {
@@ -93,12 +104,10 @@ export default async function handler(request: Request) {
             });
         }
 
-        return new Response(JSON.stringify(data), {
+        return new Response(JSON.stringify(parsedData), {
             status: 200,
             headers: { 'Content-Type': 'application/json' }
         });
-
-
 
     } catch (error: any) {
         console.error("API Error - Stack:", error.stack);
