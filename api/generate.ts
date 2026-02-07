@@ -2,6 +2,10 @@ import { GoogleGenAI, Type } from "@google/genai";
 
 
 
+export const config = {
+    maxDuration: 60,
+};
+
 const apiKey = process.env.GEMINI_API_KEY;
 
 export default async function handler(request: Request) {
@@ -31,7 +35,7 @@ export default async function handler(request: Request) {
 
         const ai = new GoogleGenAI({ apiKey });
         const response = await ai.models.generateContent({
-            model: 'gemini-3-pro-preview',
+            model: 'gemini-1.5-flash',
             contents: `Analyze the following teacher's schedule description and extract structured data.
       
       Description: "${description}"
