@@ -94,10 +94,7 @@ export default async function handler(request: Request) {
             headers: { 'Content-Type': 'application/json' }
         });
 
-        return new Response(JSON.stringify(data), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
-        });
+
 
     } catch (error: any) {
         console.error("API Error - Stack:", error.stack);
