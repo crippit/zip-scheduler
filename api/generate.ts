@@ -115,7 +115,7 @@ export default async function handler(request: Request) {
         console.error("API Error - Full:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
 
         return new Response(JSON.stringify({
-            error: "Internal Server Error",
+            error: error.message || "Internal Server Error",
             details: error.message,
             stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         }), {
