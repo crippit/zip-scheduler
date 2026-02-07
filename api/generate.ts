@@ -73,8 +73,23 @@ export default async function handler(request: Request) {
             }
         });
 
-        const jsonStr = response.text?.trim() || "{}";
-        const data = JSON.parse(jsonStr);
+        let jsonStr = response.text?.trim() || "{}";
+
+        // Remove markdown code blocks if present
+        if (jsonStr.startsWith('```')) {
+            jsonStr = jsonStr.replace(/^```(json)?\n/, '').replace(/```$/, '').trim();
+        }
+
+        let data;
+        try {
+            data = JSON.parse(jsonStr);
+        } catch (parseError) {
+            console.error("JSON Parse Error:", parseError, "Raw Response:", jsonStr);
+            return new Response(JSON.stringify({ error: "Failed to parse AI response", raw: jsonStr }), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
 
         return new Response(JSON.stringify(data), {
             status: 200,

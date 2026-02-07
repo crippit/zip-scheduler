@@ -5,10 +5,10 @@ export function generateDateRange(start: string, end: string): string[] {
   const dates = [];
   let current = new Date(start);
   const last = new Date(end);
-  
+
   while (current <= last) {
     dates.push(current.toISOString().split('T')[0]);
-    current.setDate(current.getDate() + 1);
+    current.setUTCDate(current.getUTCDate() + 1);
   }
   return dates;
 }
@@ -25,7 +25,7 @@ export function calculateScheduleMappings(
     const date = new Date(dateStr + 'T00:00:00');
     const isWeekend = date.getDay() === 0 || date.getDay() === 6;
     const exception = exceptions.find(e => e.date === dateStr);
-    
+
     let type = DayType.SCHOOL_DAY;
     if (isWeekend) type = DayType.WEEKEND;
     if (exception) type = exception.type;
