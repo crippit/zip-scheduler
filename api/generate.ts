@@ -1,8 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-export const config = {
-    runtime: 'edge',
-};
+
 
 const apiKey = process.env.GEMINI_API_KEY;
 
@@ -96,9 +94,21 @@ export default async function handler(request: Request) {
             headers: { 'Content-Type': 'application/json' }
         });
 
-    } catch (error) {
-        console.error("API Error:", error);
-        return new Response(JSON.stringify({ error: "Internal Server Error" }), {
+        return new Response(JSON.stringify(data), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+    } catch (error: any) {
+        console.error("API Error - Stack:", error.stack);
+        console.error("API Error - Message:", error.message);
+        console.error("API Error - Full:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+
+        return new Response(JSON.stringify({
+            error: "Internal Server Error",
+            details: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
