@@ -1,8 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-export const config = {
-    runtime: 'edge',
-};
+
 
 const apiKey = process.env.GEMINI_API_KEY;
 
