@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect, useMemo, KeyboardEvent } from 'react';
-import { 
-  CycleConfig, 
-  Period, 
-  DayException, 
-  OffDayBehavior, 
-  DayType, 
-  ScheduleGrid, 
-  DateMapping 
+import {
+  CycleConfig,
+  Period,
+  DayException,
+  OffDayBehavior,
+  DayType,
+  ScheduleGrid,
+  DateMapping
 } from './types';
 import { calculateScheduleMappings, exportToGCalCSV, generateDateRange } from './utils/scheduler';
 import { parseScheduleDescription } from './services/geminiService';
@@ -19,9 +19,8 @@ const StepIndicator = ({ currentStep }: { currentStep: number }) => {
     <div className="flex justify-between mb-8 overflow-x-auto pb-2">
       {steps.map((label, idx) => (
         <div key={label} className="flex flex-col items-center mx-2 min-w-[60px]">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-            currentStep >= idx + 1 ? 'bg-primary-600 border-primary-600 text-white' : 'border-slate-300 dark:border-slate-700 text-slate-400'
-          }`}>
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${currentStep >= idx + 1 ? 'bg-primary-600 border-primary-600 text-white' : 'border-slate-300 dark:border-slate-700 text-slate-400'
+            }`}>
             {currentStep > idx + 1 ? <i className="fas fa-check"></i> : idx + 1}
           </div>
           <span className={`text-xs mt-2 font-medium ${currentStep >= idx + 1 ? 'text-primary-600' : 'text-slate-400'}`}>{label}</span>
@@ -61,7 +60,7 @@ const TagInput = ({ label, tags, placeholder, onAdd, onRemove }: TagInputProps) 
         {tags.map((tag, idx) => (
           <span key={`${tag}-${idx}`} className="flex items-center bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 px-2 py-1 rounded-md text-sm font-medium">
             {tag}
-            <button 
+            <button
               onClick={() => onRemove(idx)}
               className="ml-2 text-primary-400 hover:text-primary-600 dark:hover:text-primary-200"
             >
@@ -87,7 +86,7 @@ export default function App() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [nlpInput, setNlpInput] = useState('');
-  
+
   // State for all data
   const [config, setConfig] = useState<CycleConfig>({
     cycleDays: 6,
@@ -123,7 +122,7 @@ export default function App() {
     setLoading(true);
     try {
       const result = await parseScheduleDescription(nlpInput);
-      
+
       setConfig(prev => ({
         ...prev,
         cycleDays: result.cycleDays || prev.cycleDays,
@@ -177,7 +176,7 @@ export default function App() {
   const monthsData = useMemo(() => {
     const allDates = generateDateRange(config.startDate, config.endDate);
     const groups: { [key: string]: string[] } = {};
-    
+
     allDates.forEach(dateStr => {
       const date = new Date(dateStr + 'T00:00:00');
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -193,7 +192,7 @@ export default function App() {
       <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">Z</div>
+            <img src="/icon-192.png" alt="ZipCycle Scheduler" className="w-10 h-10 rounded-lg shadow-sm" />
             <div>
               <h1 className="text-xl font-bold tracking-tight">ZipCycle <span className="text-primary-600 font-normal">Scheduler</span></h1>
               <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest">A Zip Solutions Product</p>
@@ -213,13 +212,13 @@ export default function App() {
                   <i className="fas fa-magic text-primary-500 mr-3"></i> Quick Setup
                 </h2>
                 <div className="relative">
-                  <textarea 
+                  <textarea
                     value={nlpInput}
                     onChange={(e) => setNlpInput(e.target.value)}
                     placeholder="Describe your schedule (e.g., 'I teach Math 10 and Physics 11. I have a 6 day cycle. Room 101.')"
                     className="w-full h-32 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all resize-none"
                   />
-                  <button 
+                  <button
                     onClick={handleNlpSubmit}
                     disabled={loading || !nlpInput.trim()}
                     className="absolute bottom-4 right-4 bg-primary-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-50 transition-all shadow-lg"
@@ -234,56 +233,56 @@ export default function App() {
               <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold mb-2">Cycle Length (Days)</label>
-                  <input 
-                    type="number" 
-                    value={config.cycleDays} 
-                    onChange={(e) => setConfig({...config, cycleDays: parseInt(e.target.value) || 1})}
+                  <input
+                    type="number"
+                    value={config.cycleDays}
+                    onChange={(e) => setConfig({ ...config, cycleDays: parseInt(e.target.value) || 1 })}
                     className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 shadow-sm"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-2">Periods per Day</label>
-                  <input 
-                    type="number" 
-                    value={config.periodsPerDay} 
-                    onChange={(e) => setConfig({...config, periodsPerDay: parseInt(e.target.value) || 1})}
+                  <input
+                    type="number"
+                    value={config.periodsPerDay}
+                    onChange={(e) => setConfig({ ...config, periodsPerDay: parseInt(e.target.value) || 1 })}
                     className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 shadow-sm"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-2">School Year Starts</label>
-                  <input 
-                    type="date" 
-                    value={config.startDate} 
-                    onChange={(e) => setConfig({...config, startDate: e.target.value})}
+                  <input
+                    type="date"
+                    value={config.startDate}
+                    onChange={(e) => setConfig({ ...config, startDate: e.target.value })}
                     className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 shadow-sm"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-2">School Year Ends</label>
-                  <input 
-                    type="date" 
-                    value={config.endDate} 
-                    onChange={(e) => setConfig({...config, endDate: e.target.value})}
+                  <input
+                    type="date"
+                    value={config.endDate}
+                    onChange={(e) => setConfig({ ...config, endDate: e.target.value })}
                     className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 shadow-sm"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-2">First Day Cycle Number</label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     min="1"
                     max={config.cycleDays}
-                    value={config.firstCycleDay} 
-                    onChange={(e) => setConfig({...config, firstCycleDay: parseInt(e.target.value) || 1})}
+                    value={config.firstCycleDay}
+                    onChange={(e) => setConfig({ ...config, firstCycleDay: parseInt(e.target.value) || 1 })}
                     className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 shadow-sm"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-2">Non-Teaching Day Action</label>
-                  <select 
+                  <select
                     value={config.offDayBehavior}
-                    onChange={(e) => setConfig({...config, offDayBehavior: e.target.value as OffDayBehavior})}
+                    onChange={(e) => setConfig({ ...config, offDayBehavior: e.target.value as OffDayBehavior })}
                     className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 shadow-sm"
                   >
                     <option value={OffDayBehavior.PAUSE}>Pause Cycle (Pick up where we left off)</option>
@@ -310,7 +309,7 @@ export default function App() {
               </section>
 
               <div className="flex justify-end">
-                <button 
+                <button
                   onClick={() => setStep(2)}
                   className="bg-primary-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-primary-700 transition-all flex items-center space-x-2 shadow-lg"
                 >
@@ -339,8 +338,8 @@ export default function App() {
                     {periods.map((p, idx) => (
                       <tr key={p.id}>
                         <td className="py-4 pr-4">
-                          <input 
-                            value={p.name} 
+                          <input
+                            value={p.name}
                             onChange={(e) => {
                               const next = [...periods];
                               next[idx].name = e.target.value;
@@ -350,9 +349,9 @@ export default function App() {
                           />
                         </td>
                         <td className="py-4 pr-4">
-                          <input 
-                            type="time" 
-                            value={p.startTime} 
+                          <input
+                            type="time"
+                            value={p.startTime}
                             onChange={(e) => {
                               const next = [...periods];
                               next[idx].startTime = e.target.value;
@@ -362,9 +361,9 @@ export default function App() {
                           />
                         </td>
                         <td className="py-4">
-                          <input 
-                            type="time" 
-                            value={p.endTime} 
+                          <input
+                            type="time"
+                            value={p.endTime}
                             onChange={(e) => {
                               const next = [...periods];
                               next[idx].endTime = e.target.value;
@@ -395,18 +394,18 @@ export default function App() {
                   <p className="text-sm text-slate-500 mb-4">Click dates to toggle between Holiday, PD Day, and Exam Day.</p>
                 </div>
                 <div className="flex gap-4 text-[10px] font-bold uppercase tracking-wider">
-                   <div className="flex items-center"><span className="w-3 h-3 bg-red-500 rounded mr-1"></span> Holiday</div>
-                   <div className="flex items-center"><span className="w-3 h-3 bg-amber-500 rounded mr-1"></span> PD Day</div>
-                   <div className="flex items-center"><span className="w-3 h-3 bg-blue-500 rounded mr-1"></span> Exam</div>
+                  <div className="flex items-center"><span className="w-3 h-3 bg-red-500 rounded mr-1"></span> Holiday</div>
+                  <div className="flex items-center"><span className="w-3 h-3 bg-amber-500 rounded mr-1"></span> PD Day</div>
+                  <div className="flex items-center"><span className="w-3 h-3 bg-blue-500 rounded mr-1"></span> Exam</div>
                 </div>
               </div>
-              
+
               <div className="space-y-10 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                 {monthsData.map(([monthKey, dates]) => {
                   const firstDate = new Date(dates[0] + 'T00:00:00');
                   const monthName = firstDate.toLocaleString('default', { month: 'long', year: 'numeric' });
-                  const startDay = firstDate.getDay(); 
-                  
+                  const startDay = firstDate.getDay();
+
                   return (
                     <div key={monthKey} className="space-y-3">
                       <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 dark:border-slate-800 pb-2">{monthName}</h3>
@@ -414,7 +413,7 @@ export default function App() {
                         {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
                           <div key={i} className="text-center text-[10px] font-bold text-slate-400 py-1">{d}</div>
                         ))}
-                        
+
                         {Array.from({ length: startDay }).map((_, i) => (
                           <div key={`pad-${i}`} className="h-12"></div>
                         ))}
@@ -423,9 +422,9 @@ export default function App() {
                           const dateObj = new Date(d + 'T00:00:00');
                           const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
                           const currentException = exceptions.find(e => e.date === d);
-                          
+
                           return (
-                            <button 
+                            <button
                               key={d}
                               disabled={isWeekend}
                               onClick={() => {
@@ -434,13 +433,12 @@ export default function App() {
                                 const nextType = types[(currentIdx + 1) % types.length];
                                 toggleException(d, nextType);
                               }}
-                              className={`relative h-12 border border-slate-100 dark:border-slate-800 rounded-md transition-all flex flex-col items-center justify-center ${
-                                isWeekend ? 'bg-slate-50 dark:bg-slate-900/50 opacity-30 cursor-not-allowed border-slate-200 dark:border-slate-700' : 
+                              className={`relative h-12 border border-slate-100 dark:border-slate-800 rounded-md transition-all flex flex-col items-center justify-center ${isWeekend ? 'bg-slate-50 dark:bg-slate-900/50 opacity-30 cursor-not-allowed border-slate-200 dark:border-slate-700' :
                                 currentException?.type === DayType.HOLIDAY ? 'bg-red-500 text-white border-red-600 shadow-sm' :
-                                currentException?.type === DayType.PD_DAY ? 'bg-amber-500 text-white border-amber-600 shadow-sm' :
-                                currentException?.type === DayType.EXAM_DAY ? 'bg-blue-500 text-white border-blue-600 shadow-sm' :
-                                'hover:bg-slate-100 dark:hover:bg-slate-800'
-                              }`}
+                                  currentException?.type === DayType.PD_DAY ? 'bg-amber-500 text-white border-amber-600 shadow-sm' :
+                                    currentException?.type === DayType.EXAM_DAY ? 'bg-blue-500 text-white border-blue-600 shadow-sm' :
+                                      'hover:bg-slate-100 dark:hover:bg-slate-800'
+                                }`}
                             >
                               <span className="text-xs font-bold">{dateObj.getDate()}</span>
                             </button>
@@ -484,7 +482,7 @@ export default function App() {
                           const assignment = grid[cycleDay]?.[p.id] || { className: '', roomNumber: '' };
                           return (
                             <td key={i} className="p-3 border-r border-slate-100 dark:border-slate-800 min-w-[200px]">
-                              <select 
+                              <select
                                 value={assignment.className}
                                 onChange={(e) => {
                                   setGrid(prev => ({
@@ -539,16 +537,16 @@ export default function App() {
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold">Review & Adjust</h2>
-                <button 
+                <button
                   onClick={downloadCSV}
                   className="bg-primary-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-primary-700 shadow-lg flex items-center transition-all hover:scale-105 active:scale-95"
                 >
                   <i className="fas fa-file-export mr-2"></i> Export to GCal (CSV)
                 </button>
               </div>
-              
+
               <p className="text-sm text-slate-500">Review the final cycle assignments. You can see which classes are scheduled for each date based on its Cycle Day.</p>
-              
+
               <div className="max-h-[600px] overflow-y-auto border border-slate-100 dark:border-slate-800 rounded-xl custom-scrollbar shadow-inner">
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 z-20">
@@ -570,19 +568,18 @@ export default function App() {
                             {new Date(m.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                           </td>
                           <td className="p-4">
-                            <span className={`text-[10px] font-black uppercase px-2 py-1 rounded whitespace-nowrap ${
-                              m.type === DayType.SCHOOL_DAY ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                            <span className={`text-[10px] font-black uppercase px-2 py-1 rounded whitespace-nowrap ${m.type === DayType.SCHOOL_DAY ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
                               m.type === DayType.HOLIDAY ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-                              m.type === DayType.PD_DAY ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
-                              m.type === DayType.EXAM_DAY ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                              'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-500'
-                            }`}>
+                                m.type === DayType.PD_DAY ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                                  m.type === DayType.EXAM_DAY ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                    'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-500'
+                              }`}>
                               {m.type.replace('_', ' ')}
                             </span>
                           </td>
                           <td className="p-4 text-center">
                             {m.cycleDay !== null ? (
-                              <select 
+                              <select
                                 value={m.cycleDay}
                                 onChange={(e) => {
                                   const next = [...finalMappings];
@@ -622,7 +619,7 @@ export default function App() {
                   </tbody>
                 </table>
               </div>
-              
+
               <div className="flex justify-start">
                 <button onClick={() => setStep(4)} className="text-slate-500 font-semibold hover:text-slate-700 transition-colors">
                   <i className="fas fa-chevron-left mr-2"></i> Back to Grid
@@ -637,9 +634,9 @@ export default function App() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center opacity-60">
           <p className="text-xs font-medium tracking-tight">ZipCycle Scheduler &copy; {new Date().getFullYear()} Zip Solutions. Built for Teachers.</p>
           <div className="flex space-x-6 mt-4 md:mt-0 text-[10px] font-black uppercase tracking-widest">
-             <span className="cursor-pointer hover:text-primary-600 transition-colors">Terms</span>
-             <span className="cursor-pointer hover:text-primary-600 transition-colors">Privacy</span>
-             <span className="cursor-pointer hover:text-primary-600 transition-colors">Support</span>
+            <span className="cursor-pointer hover:text-primary-600 transition-colors">Terms</span>
+            <span className="cursor-pointer hover:text-primary-600 transition-colors">Privacy</span>
+            <span className="cursor-pointer hover:text-primary-600 transition-colors">Support</span>
           </div>
         </div>
       </footer>
